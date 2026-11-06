@@ -1,0 +1,4 @@
+id,store_id,name,price_krw,stock
+101,shop-a,캠핑 의자,39000,12
+102,shop-a,캠핑 랜턴,25000,0
+103,shop-b,캠핑 의자,41000,3

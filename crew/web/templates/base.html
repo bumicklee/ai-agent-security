@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>cs-crew · {{ page }}</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <strong>cs-crew</strong> <span class="dim">쇼핑몰 고객센터 에이전트 팀 · 가짜 값 · 127.0.0.1</span>
+  <nav>
+    <a href="/chat" class="{{ 'on' if page == 'chat' }}">고객 채팅</a>
+    <a href="/inbox" class="{{ 'on' if page == 'inbox' }}">메일 문의</a>
+    <a href="/staff" class="{{ 'on' if page == 'staff' }}">직원 콘솔</a>
+    <a href="/ops" class="{{ 'on' if page == 'ops' }}">운영</a>
+  </nav>
+  <form method="post" action="/login" class="login">
+    <input type="hidden" name="back" value="/{{ page }}">
+    <select name="user" onchange="this.form.submit()">
+      {% for u in users %}<option value="{{ u.id }}" {{ 'selected' if u.id == me.id }}>{{ u.id }} · {{ u.store_id }} · {{ u.role }}</option>{% endfor %}
+    </select>
+  </form>
+  <span class="model">{{ model }}</span>
+</header>
+<main>{% block main %}{% endblock %}</main>
+<script src="/static/app.js"></script>
+</body>
+</html>

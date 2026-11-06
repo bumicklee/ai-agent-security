@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block main %}
+<div class="ops">
+  <section class="org">
+    <h2>조직도</h2>
+    {% for s in state.slots %}<div class="slot {{ 'on' if s.active }}">{{ s.name }}<small>{{ s.joins }}</small></div>{% endfor %}
+    <h2>OWASP 지도</h2>
+    {% for m in state.map %}<div class="map"><span class="gauge">{{ m.gauge }}</span> {{ m.name }}</div>{% endfor %}
+  </section>
+  <section class="timeline">
+    <h2>행동 타임라인 <button id="refresh">새로고침</button></h2>
+    <div id="timeline"></div>
+  </section>
+  <section class="side">
+    <h2>요금 미터</h2>
+    <div class="meter"><div id="meter-bar"></div></div>
+    <p id="meter-text" class="dim"></p>
+    <h2>킬 스위치</h2>
+    <label class="kill"><input type="checkbox" id="kill" {{ 'checked' if state.kill }}> 모든 에이전트 멈춤</label>
+    {% if state.controls %}
+    <div class="controls">
+      <select id="pause-agent">{% for s in state.slots %}{% if s.active %}<option>{{ s.agent }}</option>{% endif %}{% endfor %}</select>
+      <button data-ops="pause">담당 멈춤</button> <button data-ops="resume">다시 켜기</button><br>
+      <button data-ops="revoke">위임 토큰 일괄 폐기</button> <button data-ops="mcp">택배사 MCP 차단</button> <button data-ops="mcp-open">MCP 다시 열기</button>
+      <p class="dim" id="ops-note">멈춤: {{ state.paused | join(', ') or '없음' }} · MCP 차단: {{ state.mcp_blocked | join(', ') or '없음' }}</p>
+    </div>
+    {% else %}<p class="lock">🔒 담당 멈춤·토큰 폐기·MCP 차단은 12-4 수업에서 만듭니다</p>{% endif %}
+    <h2>감시자</h2>
+    <p class="dim">행동 기록 체인: {% if state.chain.ok %}정상({{ state.chain.rows }}줄){% else %}<span class="warn">#{{ state.chain.bad_id }}에서 끊김 — {{ state.chain.why }}</span>{% endif %}</p>
+    <button id="watchdog">감시자 점검</button> <span id="watchdog-out" class="dim"></span>
+    {% for a in state.alerts %}<div class="alert">⚠ {{ a.ts[11:] }} {{ a.agent }} · {{ a.why }}</div>{% else %}<p class="dim">경보 없음</p>{% endfor %}
+    <h2>레드팀 콘솔</h2>
+    <p class="dim">버튼을 누르면 내 랩에 공격이 들어갑니다. 결과: 사고 / 막힘(어느 층) / 잠김</p>
+    {% for sc in scenarios %}
+    <div class="rt" id="rt-{{ sc.id }}">
+      <button data-rt="{{ sc.id }}">{{ sc.id }}</button> {{ sc.title }} <small>{{ sc.asi }}</small>
+      <span class="rt-state"></span>
+    </div>
+    {% endfor %}
+  </section>
+</div>
+<script>window.OPS = {{ state | tojson }};</script>
+{% endblock %}

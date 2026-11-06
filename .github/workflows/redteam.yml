@@ -1,0 +1,42 @@
+# 13-2: 레드팀 콘솔을 출시 게이트로. 사고나 오탐이 하나라도 있으면 PR이 레드로 멈춘다.
+# 키 없이 돈다: LLM_MODE=fake(결정적 가짜 LLM). 강사가 녹화한 실제 응답이 cassettes/에 있으면 replay로 바꾼다.
+# 네트워크 호출 없음(택배사 MCP는 stdio 하위 프로세스, 샌드박스는 제한 프로세스 모드).
+#
+# 새로 받은(clone) 저장소에는 진도(data/progress.json)가 없다. 그래서 검사할 지점을 CREW_CI_POINT로 정한다.
+#   CREW_CI_POINT: "13-5"  강의 저장소: 마지막 수업 완료 지점(정답 전부)으로 옮겨 전체 시험·레드팀을 돌린다
+#   CREW_CI_POINT: ""      내 코드 그대로: 옮기지 않는다(마친 수업 시험은 진도가 없으니 랩 시험만, 레드팀은 내 코드로)
+name: redteam-gate
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      LLM_MODE: fake          # cassettes/에 녹화가 있으면 replay
+      CREW_SANDBOX: process
+      CREW_TRACING: "off"
+      CREW_CI_POINT: "13-5"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: 의존성
+        run: python -m venv .venv && .venv/bin/pip install -q -r requirements.txt
+      - name: 가게 데이터
+        run: .venv/bin/python -m crew seed
+      - name: 과정 검사(수업마다 시작 레드 → 정답 그린, 마지막 지점 전체 시험)
+        if: env.CREW_CI_POINT != ''
+        run: .venv/bin/python -m crew verify-course
+      - name: 검사할 지점으로(진도도 그 앞 수업까지로)
+        if: env.CREW_CI_POINT != ''
+        run: .venv/bin/python -m crew goto "$CREW_CI_POINT" done
+      - name: 마친 수업 시험(make check-all)
+        run: make check-all
+      - name: 레드팀 게이트(사고·오탐 0)
+        run: .venv/bin/python -m crew redteam --ci

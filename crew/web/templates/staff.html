@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block main %}
+<h1>직원 콘솔 {% if not is_staff %}<span class="warn">지금은 고객으로 로그인했습니다. 위 선택 상자에서 dave·carol로 바꾸세요</span>{% endif %}</h1>
+<div class="grid">
+  <section>
+    <h2>미처리 문의 <small class="dim">{{ me.store_id }} 매장 것만</small></h2>
+    {% if not panels.delegate %}<p class="lock">🔒 "대신 처리" 버튼은 7-1 수업에서 만듭니다</p>{% endif %}
+    <table>
+      {% for t in tickets %}<tr><td>{{ t.id }}</td><td>{{ t.store_id }}</td><td>{{ t.name }}</td><td>{{ t.channel }}</td><td>{{ t.subject }}</td>
+        <td>{% if panels.delegate %}<button data-act="{{ t.id }}">대신 처리</button><div class="answer" id="act-{{ t.id }}"></div>{% endif %}</td></tr>{% endfor %}
+    </table>
+  </section>
+  <section>
+    <h2>승인 대기열</h2>
+    {% if panels.approvals %}
+      {% for a in approvals %}
+      <div class="card risk-{{ a.risk }}" id="ap-{{ a.id }}">
+        <div><strong>#{{ a.id }} {{ a.action }}</strong> · {{ a.store_id }} · {{ a.user_id }} · 위험 <span class="risk">{{ a.risk }}</span>
+          {% if a.approvers > 1 %} · 두 사람 승인{% if a.decided_by %} (1차: {{ a.decided_by }}){% endif %}{% endif %}</div>
+        <div class="dim">모델이 쓴 요약: “{{ a.summary or '없음' }}”</div>
+        {% if a.diff %}<pre class="diff">{{ a.diff }}</pre>{% else %}<p class="dim">실제로 바뀌는 내용(diff)이 없습니다 — 6-4 수업에서 붙입니다</p>{% endif %}
+        <button data-approve="{{ a.id }}" data-ok="1">승인</button> <button data-approve="{{ a.id }}" data-ok="0">거절</button>
+        <span class="ap-state"></span>
+      </div>
+      {% else %}<p class="dim">대기 중인 승인이 없습니다.</p>{% endfor %}
+    {% else %}<p class="lock">🔒 6-1 수업에서 만듭니다 — 환불 담당이 들어오면 여기에 승인 요청이 쌓입니다</p>{% endif %}
+  </section>
+  <section>
+    <h2>고객 메모 검토</h2>
+    {% if panels.memories %}
+      {% if not panels.review %}<p class="lock">🔒 확인·삭제·되돌리기 버튼은 8-4 수업에서 만듭니다</p>{% endif %}
+      <table>
+        <tr class="dim"><td>#</td><td>고객</td><td>메모</td><td>출처</td><td>등급</td><td>만료</td><td></td></tr>
+        {% for m in memories %}<tr id="memo-{{ m.id }}" class="trust-{{ m.trust }}"><td>{{ m.id }}</td><td>{{ m.customer_id }}</td><td>{{ m.text }}</td>
+          <td>{{ m.source }}</td><td>{{ m.trust }}{% if m.reviewed_by %} ({{ m.reviewed_by }}){% endif %}</td><td>{{ (m.expires_at or '없음')[:10] }}</td>
+          <td>{% if panels.review %}<button data-memo="{{ m.id }}" data-do="confirm">확인</button> <button data-memo="{{ m.id }}" data-do="delete">삭제</button>
+            <button data-rollback="{{ m.customer_id }}">이 고객 미확인 되돌리기</button>{% endif %}<span class="memo-state"></span></td></tr>{% endfor %}
+      </table>
+      <p class="dim">8-3의 메모 규칙(내 <code>crew/tools/memories.py</code>)이 상담 지시문에 붙일 메모를 고릅니다: 직원이 확인했고(confirmed) 만료가 지나지 않은 메모만.
+        8-3 전에는 이 화면의 모든 메모가 그대로 다음 상담에 붙습니다.</p>
+    {% else %}<p class="lock">🔒 8-1 수업에서 만듭니다 — 상담원이 고객을 기억하기 시작합니다</p>{% endif %}
+  </section>
+  <section>
+    <h2>주간 리포트</h2>
+    {% if panels.reports %}<p class="dim">리포트 담당이 파이썬으로 계산합니다(9-4부터 샌드박스 안에서).</p>
+      <button id="report">지난주 환불 통계 만들기</button><pre class="report" id="report-out"></pre>
+    {% else %}<p class="lock">🔒 9-1 수업에서 만듭니다 — 리포트 담당이 파이썬으로 통계를 냅니다</p>{% endif %}
+  </section>
+</div>
+{% endblock %}

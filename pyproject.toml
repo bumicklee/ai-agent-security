@@ -1,0 +1,13 @@
+# 「LLM 에이전트 보안 실전」 랩 cs-crew. 모든 값은 가짜, 127.0.0.1만.
+[project]
+name = "cs-crew"
+version = "0.1.0"
+description = "쇼핑몰 고객센터 에이전트 팀 — 만들면서 막는 에이전트 보안 랩"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q -p no:cacheprovider"
+markers = [
+    "normal: 시작 지점에서도 그린이 맞는 시험(오탐 없음·정상 요청이 그대로 되는지 보는 짝, 또는 새 기능이 지켜야 할 안전 조건이라 기능이 없을 때도 참인 것). verify-course가 시작 레드 검사에서 뺀다",
+]

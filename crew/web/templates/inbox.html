@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block main %}
+<h1>메일 문의 <span class="dim">메일 본문이 그대로 에이전트에게 갑니다 — 간접 인젝션이 들어오는 길</span></h1>
+<table>
+  <tr><th>#</th><th>보낸 고객</th><th>제목</th><th>본문</th><th></th></tr>
+  {% for t in tickets %}
+  <tr>
+    <td>{{ t.id }}</td><td>{{ t.name }}({{ t.customer_id }})</td><td>{{ t.subject }}</td>
+    <td class="body">{{ t.body }}</td>
+    <td><button data-ticket="{{ t.id }}">에이전트에게 맡기기</button><div class="answer" id="ans-{{ t.id }}"></div></td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

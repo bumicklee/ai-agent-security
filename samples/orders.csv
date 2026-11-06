@@ -1,0 +1,2 @@
+id,store_id,customer_id,status,total_krw,address,created_at
+9001,shop-a,alice,paid,39000,서울시 가짜구 예시길 30,2026-10-30T10:00:00

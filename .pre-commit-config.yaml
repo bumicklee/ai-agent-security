@@ -1,0 +1,10 @@
+# 1-4: 키가 저장소에 들어가지 않게. 설치: pip install pre-commit && pre-commit install
+# 훅은 이 폴더의 작은 파이썬 스크립트라 따로 내려받는 것이 없다(language: system)
+repos:
+  - repo: local
+    hooks:
+      - id: no-env-no-keys
+        name: .env 파일·sk- 키 막기
+        entry: python scripts/check_secrets.py
+        language: system
+        pass_filenames: true

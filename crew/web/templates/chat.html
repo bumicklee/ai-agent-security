@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block main %}
+<section class="chat">
+  <h1>고객 채팅 <span class="dim">{{ me.name }}({{ me.id }})으로 로그인</span></h1>
+  <div id="log" class="log"></div>
+  <form id="ask" class="ask">
+    <input name="text" autocomplete="off" placeholder="예: 주문 1002 어디쯤 왔어요? / 환불 기간이 어떻게 되나요?">
+    <button>보내기</button>
+  </form>
+  {% if report_on %}<p class="dim">이상한 답을 받았으면 답 옆 <b>신고</b>를 누르세요. 운영자가 /ops에서 봅니다.</p>
+  {% else %}<p class="lock">🔒 답 옆 "신고" 버튼은 12-3 수업에서 열립니다</p>{% endif %}
+</section>
+<script>window.CREW_REPORT = {{ 'true' if report_on else 'false' }};</script>
+{% endblock %}

@@ -1,0 +1,11 @@
+# cs-crew 랩 의존성 (2026-10-30 고정). 바꿀 때는 make check-all로 확인
+openai-agents==0.24.0
+openai==3.41.0
+fastapi==0.162.0
+uvicorn==0.54.0
+jinja2==3.1.6
+python-multipart==0.0.32
+pyyaml==6.0.3
+pytest==9.2.0
+httpx==0.28.1
+mcp==2.3.0            # 10장 택배사 MCP 서버(carrier-mcp/). openai-agents가 함께 설치하지만 버전을 고정한다
